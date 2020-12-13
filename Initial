@@ -1,0 +1,181 @@
+f = open("bike_rental.txt", 'a+')
+
+
+class Customer:
+    def __init__(self):
+        self.bikes = 0
+        self.rentalBasis = 0
+        self.rentalTime = 0
+        self.bill = 0
+
+    def requestBike(self):
+        bikes = input("How many bikes would you like to rent?")
+        try:
+            bikes = int(bikes)
+        except ValueError:
+            print("That's not a positive integer!")
+            f.writelines("That's not a positive integer!."+"\n")
+            return -1
+        if bikes < 1:
+            print("Invalid input. No of bikes should be > 0!")
+            f.writelines("Invalid input. No of bikes should be > 0!."+"\n")
+            return -1
+        else:
+            self.bikes = bikes
+        return self.bikes
+
+    def returnBike(self):
+        if self.rentalBasis and self.rentalTime and self.bikes:
+            return self.rentalTime, self.rentalBasis, self.bikes
+        else:
+            return 0, 0, 0
+
+
+class BikeRental:
+    def __init__(self, stock=0):
+        self.stock = stock
+
+    def displaystock(self):
+        print("We've currently {} bikes to rent.".format(self.stock))
+        f.writelines("We've currently {} bikes to rent.".format(self.stock))
+        return self.stock
+
+    def rentBikeOnHr(self, n):
+        if n <= 0:
+            print("No of bikes should be positive!")
+            f.writelines("No of bikes should be positive!."+"\n")
+            return None
+        elif n > self.stock:
+            print("Sorry! We've {} bikes to rent.".format(self.stock))
+            f.writelines("Sorry! We've {} bikes to rent.".format(self.stock))
+            return None
+        else:
+            now = datetime.datetime.now()
+            print("You rented a{} bike hr basis at {}hrs.".format(n, now.hour))
+            f.writelines("u rented a{} bike hr at {}hrs.".format(n, now.hour))
+            print("You'll be charged Rs50 for each hour per bike.")
+            f.writelines("You'll be charged Rs50 for each hour per bike."+"\n")
+            print("We hope that you enjoy our service.")
+            f.writelines("We hope that you enjoy our service."+"\n")
+            self.stock -= n
+            return now
+
+    def rentBikeOnDy(self, n):
+        if n <= 0:
+            print("Number of bikes should be positive!")
+            f.writelines("Number of bikes should be positive!."+"\n")
+            return None
+        elif n > self.stock:
+            print("Sorry! We've {} bikes to rent.".format(self.stock))
+
+            return None
+        else:
+            now = datetime.datetime.now()
+            print("u rented{}bike daily at{}hrs.".format(n, now.hour))
+            f.writelines("u rented{}bike daily at{}hrs.".format(n, now.hour))
+            print("You'll be charged Rs200 for each day per bike.")
+            f.writelines("You'll be charged Rs200 for each day per bike."+"\n")
+            print("We hope that you enjoy our service.")
+            f.writelines("We hope that you enjoy our service."+"\n")
+            self.stock -= n
+            return now
+
+    def rentBikeOnwy(self, n):
+        if n <= 0:
+            print("Number of bikes should be positive!")
+            f.writelines("Number of bikes should be positive!."+"\n")
+            return None
+        elif n > self.stock:
+            print("Sorry! We've {} bikes to rent.".format(self.stock))
+            f.writelines("Sorry! We've {} bikes to rent.".format(self.stock))
+            return None
+        else:
+            now = datetime.datetime.now()
+            print("rented{}bike on weekly at{}hr.".format(n, now.hour))
+            print("You'll be charged RS600 for each wk per bike.")
+            f.writelines("You'll be charged RS600 for each wk per bike."+"\n")
+            f.writelines("rented{}bike on weekly at{}hr.".format(n, now.hour))
+            print("We hope that you enjoy our service.")
+            f.writelines("We hope that you enjoy our service."+"\n")
+            self.stock -= n
+            return now
+
+    def returnBike(self, request):
+        rentalTime, rentalBasis, numOfBikes = request
+        bill = 0
+        if rentalTime and rentalBasis and numOfBikes:
+            self.stock += numOfBikes
+            now = datetime.datetime.now()
+            rentalPeriod = now - rentalTime
+            if rentalBasis == 1:
+                bill = round(rentalPeriod.seconds / 3600) * 50 * numOfBikes
+            elif rentalBasis == 2:
+                bill = round(rentalPeriod.days) * 200 * numOfBikes
+            elif rentalBasis == 3:
+                bill = round(rentalPeriod.days / 7) * 600 * numOfBikes
+            if (3 <= numOfBikes <= 5):
+                print("You're eligible for Family rental of 30% discount")
+                f.writelines("You're eligible for Fam rental of 30% off."+"\n")
+                bill = bill * 0.7
+            print("Thanks for returning. Hope you enjoyed our service!")
+            f.writelines("Tnks for returning.Hope u njoyed our service!."+"\n")
+            print("That would be Rs{}".format(bill))
+            return bill
+        else:
+            print("Are you sure you rented a bike with us?")
+            f.writelines("Are you sure you rented a bike with us?."+"\n")
+            return None
+
+
+def main():
+    shop = BikeRental(100)
+    customer = Customer()
+    f = open("bike_rental", 'w+')
+    while True:
+        print("""
+        ====== Bike Rental Shop =======
+        1. Display available bikes
+        2. Request a bike on hourly basis Rs50
+        3. Request a bike on daily basis Rs200
+        4. Request a bike on weekly basis Rs600
+        5. Return a bike
+        6. Exit
+        """)
+        f.writelines("""
+        ====== Bike Rental Shop =======
+        1. Display available bikes
+        2. Request a bike on hourly basis Rs50
+        3. Request a bike on daily basis Rs200
+        4. Request a bike on weekly basis Rs600
+        5. Return a bike
+        6. Exit
+        """)
+        choice = input("Enter choice: ")
+        try:
+            choice = int(choice)
+        except ValueError:
+            print("That's not an int!")
+            continue
+        if choice == 1:
+            shop.displaystock()
+        elif choice == 2:
+            customer.rentalTime = shop.rentBikeOnHr(customer.requestBike())
+            customer.rentalBasis = 1
+        elif choice == 3:
+            customer.rentalTime = shop.rentBikeOnDy(customer.requestBike())
+            customer.rentalBasis = 2
+        elif choice == 4:
+            customer.rentalTime = shop.rentBikeOnwy(customer.requestBike())
+            customer.rentalBasis = 3
+        elif choice == 5:
+            customer.bill = shop.returnBike(customer.returnBike())
+            customer.rentalBasis, customer.rentalTime, customer.bikes = 0, 0, 0
+        elif choice == 6:
+            break
+        else:
+            print("Invalid input. Please enter number between 1-6 ")
+    print("Thank you for using the bike rental system.")
+if __name__ == "__main__":
+
+    main()
+f.close()
